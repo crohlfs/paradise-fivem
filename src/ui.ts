@@ -64,13 +64,19 @@ export function spacer(h: number) {
   return drawFunc;
 }
 
+export enum Align {
+  Left,
+  Right,
+  Center
+}
+
 export function text(
   w: number,
   h: number,
   str: string,
   font: number,
   size: number,
-  rightAlign: boolean = false
+  alignment: Align = Align.Left
 ) {
   function drawFunc(x: number, y: number): number {
     BeginTextCommandDisplayText("STRING");
@@ -78,7 +84,7 @@ export function text(
     SetTextColour(255, 255, 255, 255);
     SetTextScale(size, size);
 
-    if (rightAlign) {
+    if (alignment === Align.Right) {
       SetTextWrap(0, w * 1.03);
       SetTextJustification(2);
     }
@@ -86,7 +92,10 @@ export function text(
     AddTextComponentSubstringPlayerName(str);
 
     const oy = GetTextScaleHeight(size, font) / 4;
-    EndTextCommandDisplayText(x - w / 2 + 0.004, y + oy);
+    EndTextCommandDisplayText(
+      alignment === Align.Center ? x : x - w / 2 + 0.004,
+      y + oy
+    );
 
     return y + h;
   }

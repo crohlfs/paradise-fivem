@@ -1,7 +1,7 @@
 module.exports = {
   mode: "production",
   entry: {
-    character: "./src/character.ts"
+    character: "./src/character/index.ts"
   },
   resolve: {
     extensions: [".ts"]
