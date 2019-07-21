@@ -1,0 +1,94 @@
+<style>
+  body {
+    background-color: #b4b4b4;
+  }
+</style>
+<script
+  crossorigin
+  src="https://unpkg.com/react@16/umd/react.production.min.js"
+></script>
+<script
+  crossorigin
+  src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"
+></script>
+<script crossorigin src="https://unpkg.com/htm@2/dist/htm.umd.js"></script>
+<script crossorigin src="https://unpkg.com/immer@3/dist/immer.umd.js"></script>
+
+<body>
+  <div id="root"></div>
+</body>
+
+<script>
+  const { useReducer, useEffect } = React;
+  const produce = immer.default;
+  const h = htm.bind(React.createElement);
+
+  const initialState = {
+    order: 0,
+    /** @type {"PRE_INIT" | "INIT_SESSION" | "INIT_BEFORE_MAP_LOADED" | "INIT_AFTER_MAP_LOADED"} */
+    type: "PRE_INIT",
+    total: 100,
+    progress: 0,
+    mapCount: 0,
+    loadedMaps: 0,
+    messages: []
+  };
+
+  function reducer(state, data) {
+    switch (data.eventName) {
+      case "startInitFunctionOrder": {
+        return produce(state, draft => {
+          draft.total = data.count;
+          draft.order = data.order;
+          draft.type = data.type;
+        });
+      }
+      case "initFunctionInvoking": {
+        return produce(state, draft => {
+          draft.progress = data.idx;
+        });
+      }
+      case "startDataFileEntries": {
+        return produce(state, draft => {
+          draft.mapCount = data.count;
+        });
+      }
+      case "performMapLoadFunction": {
+        return produce(state, draft => {
+          draft.loadedMaps++;
+        });
+      }
+      // case "onLogLine": {
+      //   return produce(state, draft => {
+      //     draft.messages.push(data.message);
+      //   });
+      // }
+      default:
+        return state;
+    }
+  }
+
+  const Hello = () => {
+    const [state, dispatch] = useReducer(reducer, initialState);
+
+    useEffect(() => {
+      function listener(e) {
+        dispatch(e.data);
+      }
+
+      window.addEventListener("message", listener);
+
+      return () => {
+        window.removeEventListener("message", listener);
+      };
+    }, []);
+
+    return h`<div>${state.type} - ${state.order} - ${state.progress}/${
+      state.total
+    } - ${state.mapCount}/${state.totalMaps}</div>`;
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    ReactDOM.render(h`<${Hello}><//>`, document.getElementById("root"));
+  });
+</script>

@@ -1,0 +1,3 @@
+[submodule "server-data/resources/bob74_ipl"]
+	path = server-data/resources/bob74_ipl
+	url = https://github.com/Bob74/bob74_ipl

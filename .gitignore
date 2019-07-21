@@ -1,0 +1,5 @@
+node_modules
+
+server-data/cache
+server-data/secrets.cfg
+server-data/[local]
