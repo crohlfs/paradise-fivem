@@ -1,4 +1,4 @@
-import { func_1636, setEyeBrows } from "./shared";
+import { func_1636, setEyeBrows, setMakeup } from "./shared";
 import { addTick, clearTick } from "../addTick";
 import Controls from "../constants/controls";
 import MainMenuScene from "./MainMenuScene";
@@ -23,7 +23,10 @@ const baseHeight = 1080;
 const ih = 38 / baseHeight;
 const w = 432 / baseWidth;
 
-const eyeColorCount = 31;
+const eyeColorCount = 32;
+const hairStyleCount = 20;
+const eyeBrowCount = 34;
+const makeupCount = 42;
 
 export default async function(
   isMale: boolean,
@@ -39,6 +42,7 @@ export default async function(
   let eyeColor = GetPedEyeColor(ped);
   let hairStyle = GetPedDrawableVariation(ped, Components.Hair);
   let eyeBrows = GetPedHeadOverlayValue(ped, HeadOverlays.Eyebrows);
+  let makeup = GetPedHeadOverlayValue(ped, HeadOverlays.Makeup);
 
   const faceCam = CreateCamWithParams(
     "DEFAULT_SCRIPTED_CAMERA",
@@ -59,8 +63,6 @@ export default async function(
   let sliceEnd = 8;
 
   const custom = getLabel("FACE_F_P_CUST");
-  const hairStyleCount = 20;
-  const eyeBrowCount = 34;
 
   const handle = addTick(() => {
     const items = [
@@ -87,7 +89,12 @@ export default async function(
         getLabel("FACE_E_C_" + eyeColor),
         i === 7
       ),
-      optionItem(w, getLabel("FACE_F_EYEM"), custom, i === 8),
+      optionItem(
+        w,
+        getLabel("FACE_F_EYEM"),
+        getLabel("CC_MKUP_" + makeup),
+        i === 8
+      ),
       optionItem(w, getLabel("FACE_F_BLUSH"), custom, i === 9),
       optionItem(w, getLabel("FACE_F_LIPST"), custom, i === 10)
     ].slice(sliceStart, sliceEnd);
@@ -159,9 +166,16 @@ export default async function(
         }
         case 7: {
           eyeColor++;
-          if (eyeColor > eyeColorCount) eyeColor = 0;
+          if (eyeColor === eyeColorCount) eyeColor = 0;
 
           SetPedEyeColor(ped, eyeColor);
+          break;
+        }
+        case 8: {
+          makeup++;
+          if (makeup === makeupCount) makeup = 0;
+
+          setMakeup(ped, makeup, 1);
           break;
         }
       }
@@ -183,9 +197,16 @@ export default async function(
         }
         case 7: {
           eyeColor--;
-          if (eyeColor < 0) eyeColor = eyeColorCount;
+          if (eyeColor < 0) eyeColor = eyeColorCount - 1;
 
           SetPedEyeColor(ped, eyeColor);
+          break;
+        }
+        case 8: {
+          makeup--;
+          if (makeup < 0) makeup = makeupCount - 1;
+
+          setMakeup(ped, makeup, 1);
           break;
         }
       }

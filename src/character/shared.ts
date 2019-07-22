@@ -34,11 +34,18 @@ export function updateFeatures(ped: number) {
   setEyeBrows(ped, 0, 1);
   SetPedHeadOverlayColor(ped, HeadOverlays.Eyebrows, 1, 1, 1);
 
+  setMakeup(ped, 0, 1);
+  SetPedHeadOverlayColor(ped, HeadOverlays.Makeup, 1, 1, 1);
+
   SetPedEyeColor(ped, Math.round(Math.random() * 8));
 }
 
 export function setEyeBrows(ped: number, id: number, opacity: number) {
   SetPedHeadOverlay(ped, HeadOverlays.Eyebrows, id, opacity);
+}
+
+export function setMakeup(ped: number, id: number, opacity: number) {
+  SetPedHeadOverlay(ped, HeadOverlays.Makeup, id, opacity);
 }
 
 export function func_1636(
