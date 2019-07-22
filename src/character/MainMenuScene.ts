@@ -1,4 +1,15 @@
-import { drawItems, batch, header, rect, text, spacer, Align } from "../ui";
+import {
+  drawItems,
+  batch,
+  header,
+  rect,
+  text,
+  subtitle,
+  optionItem,
+  menuItem,
+  disabledItem,
+  standardSpacer
+} from "../ui";
 import { addTick, clearTick } from "../addTick";
 import Controls from "../constants/controls";
 import { waitFor, delay } from "../util";
@@ -10,7 +21,6 @@ const baseWidth = 1920;
 const baseHeight = 1080;
 
 const w = 432 / baseWidth;
-const headerHeight = 96 / baseHeight;
 const itemHeight = 38 / baseHeight;
 
 function getLabel(
@@ -144,49 +154,23 @@ export default async function(
     ];
 
     drawItems(
-      header(w, headerHeight, "Character Creator"),
-      batch(
-        rect(w, itemHeight, 0, 0, 0, 255),
-        text(w, itemHeight, "~HUD_COLOUR_HB_BLUE~NEW CHARACTER", 0, 0.325)
-      ),
-      batch(
-        rect(w, itemHeight, ...(i === 0 ? white : fadedBlack)),
-        text(w, itemHeight, getLabel(i, "Sex", 0), 0, 0.325),
-        text(
-          w,
-          itemHeight,
-          getLabel(i, isMale ? "Male" : "Female", 0, false, true),
-          0,
-          0.325,
-          Align.Right
-        )
-      ),
-      batch(
-        rect(w, itemHeight, ...(i === 1 ? white : fadedBlack)),
-        text(w, itemHeight, getLabel(i, "Heritage", 1), 0, 0.325)
-      ),
-      batch(
-        rect(w, itemHeight, ...(i === 2 ? white : fadedBlack)),
-        text(w, itemHeight, getLabel(i, "Features", 2), 0, 0.325)
-      ),
-      batch(
-        rect(w, itemHeight, ...(i === 3 ? white : fadedBlack)),
-        text(w, itemHeight, getLabel(i, "Appearance", 3, true), 0, 0.325)
-      ),
-      batch(
-        rect(w, itemHeight, ...(i === 4 ? white : fadedBlack)),
-        text(w, itemHeight, getLabel(i, "Apparel", 4, true), 0, 0.325)
-      ),
+      header(w, "Character Creator"),
+      subtitle(w, "NEW CHARACTER"),
+      optionItem(w, "Sex", isMale ? "Male" : "Female", i === 0),
+      menuItem(w, "Heritage", i === 1),
+      menuItem(w, "Features", i === 2),
+      disabledItem(w, "Appearance", i === 3),
+      disabledItem(w, "Apparel", i === 4),
       batch(
         rect(w, itemHeight, ...(i === 5 ? white : fadedBlue)),
         text(w, itemHeight, getLabel(i, "Save & Continue", 5, true), 0, 0.325)
       ),
-      spacer(2 / 1080),
-      rect(w, 3 / 1080, 0, 0, 0, 255),
+      standardSpacer,
+      rect(w, 3 / baseHeight, 0, 0, 0, 255),
       batch(
         rect(w, itemHeight, ...fadedBlack),
         text(w, itemHeight, helpTexts[i], 0, 0.325)
       )
-    )(246 / 1920, 46 / 1080);
+    )(246 / baseWidth, 46 / baseHeight);
   });
 }

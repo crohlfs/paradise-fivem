@@ -2,45 +2,32 @@ import { func_1636, updateHeritage } from "./shared";
 import { addTick, clearTick } from "../addTick";
 import Controls from "../constants/controls";
 import MainMenuScene from "./MainMenuScene";
-import { waitFor } from "../util";
 import { mums, dads } from "../constants/parents";
-import {
-  drawItems,
-  header,
-  batch,
-  rect,
-  text,
-  sprite,
-  Align,
-  spacer
-} from "../ui";
+import { drawItems, header, batch, sprite, subtitle, optionItem } from "../ui";
 
 const baseWidth = 1920;
 const baseHeight = 1080;
-
 const w = 432 / baseWidth;
-const headerHeight = 96 / baseHeight;
-const itemHeight = 38 / baseHeight;
 
-function getLabel(
-  selectedIndex: number,
-  text: string,
-  itemIndex: number,
-  disabled = false,
-  withArrows = false
-) {
-  return disabled
-    ? "~HUD_COLOUR_GREYDARK~" + text
-    : itemIndex === selectedIndex
-    ? withArrows
-      ? `~s~~HUD_COLOUR_BLACK~← ${text} ~s~~HUD_COLOUR_BLACK~→`
-      : "~HUD_COLOUR_BLACK~" + text
-    : text;
+function parentsDisplay(mum: number, dad: number) {
+  return batch(
+    sprite(w, 228 / 1080, "pause_menu_pages_char_mom_dad", "mumdadbg"),
+    (x, y) =>
+      sprite(
+        228 / 1920,
+        228 / 1080,
+        "char_creator_portraits",
+        dad > 20 ? "special_male_" + (dad - 21) : "male_" + dad
+      )(x + 0.043, y),
+    (x, y) =>
+      sprite(
+        228 / 1920,
+        228 / 1080,
+        "char_creator_portraits",
+        mum > 20 ? "special_female_" + (mum - 21) : "female_" + mum
+      )(x - 0.043, y)
+  );
 }
-
-type Vec4 = [number, number, number, number];
-const white: Vec4 = [240, 240, 240, 255];
-const fadedBlack: Vec4 = [0, 0, 0, 180];
 
 export default async function(
   isMale: boolean,
@@ -60,83 +47,19 @@ export default async function(
     const d = dads[dad];
 
     drawItems(
-      header(w, headerHeight, "Character Creator"),
-      batch(
-        rect(w, itemHeight, 0, 0, 0, 255),
-        text(w, itemHeight, "~HUD_COLOUR_HB_BLUE~HERITAGE", 0, 0.325)
+      header(w, "Character Creator"),
+      subtitle(w, "HERITAGE"),
+      parentsDisplay(mum, dad),
+      optionItem(
+        w,
+        IsGameUsingMetricMeasurementSystem() ? "Mum" : "Mom",
+        m.name,
+        i === 0
       ),
-      batch(
-        sprite(w, 228 / 1080, "pause_menu_pages_char_mom_dad", "mumdadbg"),
-        (x, y) =>
-          sprite(
-            228 / 1920,
-            228 / 1080,
-            "char_creator_portraits",
-            dad > 20 ? "special_male_" + (dad - 21) : "male_" + dad
-          )(x + 0.043, y),
-        (x, y) =>
-          sprite(
-            228 / 1920,
-            228 / 1080,
-            "char_creator_portraits",
-            mum > 20 ? "special_female_" + (mum - 21) : "female_" + mum
-          )(x - 0.043, y)
-      ),
-      batch(
-        rect(w, itemHeight, ...(i === 0 ? white : fadedBlack)),
-        text(
-          w,
-          itemHeight,
-          getLabel(i, IsGameUsingMetricMeasurementSystem() ? "Mum" : "Mom", 0),
-          0,
-          0.325
-        ),
-        text(
-          w,
-          itemHeight,
-          getLabel(i, m.name, 0, false, true),
-          0,
-          0.325,
-          Align.Right
-        )
-      ),
-      batch(
-        rect(w, itemHeight, ...(i === 1 ? white : fadedBlack)),
-        text(w, itemHeight, getLabel(i, "Dad", 1), 0, 0.325),
-        text(
-          w,
-          itemHeight,
-          getLabel(i, d.name, 1, false, true),
-          0,
-          0.325,
-          Align.Right
-        )
-      ),
-      batch(
-        rect(w, itemHeight, ...(i === 2 ? white : fadedBlack)),
-        text(w, itemHeight, getLabel(i, "Resemblance", 2), 0, 0.325),
-        text(
-          w,
-          itemHeight,
-          getLabel(i, Math.round(shapeMix * 100) + "%", 2, false, true),
-          0,
-          0.325,
-          Align.Right
-        )
-      ),
-      batch(
-        rect(w, itemHeight, ...(i === 3 ? white : fadedBlack)),
-        text(w, itemHeight, getLabel(i, "Skin Tone", 3), 0, 0.325),
-        text(
-          w,
-          itemHeight,
-          getLabel(i, Math.round(skinMix * 100) + "%", 3, false, true),
-          0,
-          0.325,
-          Align.Right
-        )
-      )
-    )(246 / 1920, 46 / 1080);
+      optionItem(w, "Dad", d.name, i === 1),
+      optionItem(w, "Resemblance", Math.round(shapeMix * 100) + "%", i === 2),
+      optionItem(w, "Skin Tone", Math.round(skinMix * 100) + "%", i === 3)
+    )(246 / baseWidth, 46 / baseHeight);
 
     if (IsControlJustPressed(0, Controls.FrontendCancel)) {
       clearTick(handle);

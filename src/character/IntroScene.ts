@@ -1,5 +1,4 @@
 import { waitFor, delay } from "../util";
-import { mums, dads } from "../constants/parents";
 import { addTick } from "../addTick";
 import MainMenuScene from "./MainMenuScene";
 import { setToDefault, updateHeritage, func_1636 } from "./shared";

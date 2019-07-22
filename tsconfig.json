@@ -2,6 +2,7 @@
   "compilerOptions": {
     "noEmit": true,
     "strict": true,
+    "noUnusedLocals": true,
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "typeRoots": ["./node_modules/@types", "./node_modules/@citizenfx"],
