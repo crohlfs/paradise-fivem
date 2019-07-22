@@ -1,9 +1,19 @@
 import { func_1636, updateHeritage } from "./shared";
 import { addTick, clearTick } from "../addTick";
-import Controls from "../constants/controls";
 import MainMenuScene from "./MainMenuScene";
+import Controls from "../constants/controls";
 import { mums, dads } from "../constants/parents";
-import { drawItems, header, batch, sprite, subtitle, optionItem } from "../ui";
+import {
+  drawItems,
+  header,
+  batch,
+  sprite,
+  subtitle,
+  optionItem,
+  helpNotice,
+  standardSpacer
+} from "../ui";
+import { getLabel } from "../util";
 
 const baseWidth = 1920;
 const baseHeight = 1080;
@@ -40,31 +50,55 @@ export default async function(
 ) {
   const ped = PlayerPedId();
 
+  const helpText = [
+    "CHARC_H_30",
+    "CHARC_H_31",
+    "CHARC_H_9",
+    "FACE_HER_ST_H"
+  ].map(getLabel);
+
   let i = 0;
 
   const handle = addTick(() => {
     const m = mums[mum];
     const d = dads[dad];
 
+    const help = helpText ? helpNotice(w, helpText[i]) : [];
+
     drawItems(
-      header(w, "Character Creator"),
+      header(w, getLabel("FACE_TITLE")),
       subtitle(w, "HERITAGE"),
       parentsDisplay(mum, dad),
+      optionItem(w, getLabel("FACE_MUMS"), m.name, i === 0),
+      optionItem(w, getLabel("FACE_DADS"), d.name, i === 1),
       optionItem(
         w,
-        IsGameUsingMetricMeasurementSystem() ? "Mum" : "Mom",
-        m.name,
-        i === 0
+        getLabel("FACE_H_DOM"),
+        Math.round(shapeMix * 100) + "%",
+        i === 2
       ),
-      optionItem(w, "Dad", d.name, i === 1),
-      optionItem(w, "Resemblance", Math.round(shapeMix * 100) + "%", i === 2),
-      optionItem(w, "Skin Tone", Math.round(skinMix * 100) + "%", i === 3)
+      optionItem(
+        w,
+        getLabel("FACE_H_STON"),
+        Math.round(skinMix * 100) + "%",
+        i === 3
+      ),
+      standardSpacer,
+      ...help
     )(246 / baseWidth, 46 / baseHeight);
 
     if (IsControlJustPressed(0, Controls.FrontendCancel)) {
       clearTick(handle);
       MainMenuScene(bodyCam, isMale, mum, dad, shapeMix, skinMix, board, 1);
-      SetCamActiveWithInterp(bodyCam, faceCam, 800, 3, 8);
+      PlaySound(
+        -1,
+        "Zoom_Out",
+        "MUGSHOT_CHARACTER_CREATION_SOUNDS",
+        false,
+        0,
+        true
+      );
+      SetCamActiveWithInterp(bodyCam, faceCam, 400, 3, 8);
       TaskPlayAnim(ped, anim, "loop", 1, -1, -1, 513, 1, false, false, false);
     } else if (IsControlJustPressed(0, Controls.FrontendUp)) {
       i--;
@@ -79,23 +113,23 @@ export default async function(
         case 0:
           mum--;
           if (mum === -1) mum = mums.length - 1;
-          updateHeritage(ped, mum, dad, shapeMix, skinMix);
+          updateHeritage(isMale, ped, mum, dad, shapeMix, skinMix);
           break;
         case 1:
           dad--;
           if (dad === -1) dad = dads.length - 1;
-          updateHeritage(ped, mum, dad, shapeMix, skinMix);
+          updateHeritage(isMale, ped, mum, dad, shapeMix, skinMix);
           break;
         case 2:
           if (shapeMix > 0) {
             shapeMix -= 0.01;
-            updateHeritage(ped, mum, dad, shapeMix, skinMix);
+            updateHeritage(isMale, ped, mum, dad, shapeMix, skinMix);
           }
           break;
         case 3:
           if (skinMix > 0) {
             skinMix -= 0.01;
-            updateHeritage(ped, mum, dad, shapeMix, skinMix);
+            updateHeritage(isMale, ped, mum, dad, shapeMix, skinMix);
           }
           break;
       }
@@ -104,23 +138,23 @@ export default async function(
         case 0:
           mum++;
           if (mum === mums.length) mum = 0;
-          updateHeritage(ped, mum, dad, shapeMix, skinMix);
+          updateHeritage(isMale, ped, mum, dad, shapeMix, skinMix);
           break;
         case 1:
           dad++;
           if (dad === dads.length) dad = 0;
-          updateHeritage(ped, mum, dad, shapeMix, skinMix);
+          updateHeritage(isMale, ped, mum, dad, shapeMix, skinMix);
           break;
         case 2:
           if (shapeMix < 1) {
             shapeMix += 0.01;
-            updateHeritage(ped, mum, dad, shapeMix, skinMix);
+            updateHeritage(isMale, ped, mum, dad, shapeMix, skinMix);
           }
           break;
         case 3:
           if (skinMix < 1) {
             skinMix += 0.01;
-            updateHeritage(ped, mum, dad, shapeMix, skinMix);
+            updateHeritage(isMale, ped, mum, dad, shapeMix, skinMix);
           }
           break;
       }
@@ -142,7 +176,8 @@ export default async function(
   func_1636(faceCam, 1.5, 3.5, 0.5, 1);
   ShakeCam(faceCam, "HAND_SHAKE", 0.1);
 
-  SetCamActiveWithInterp(faceCam, bodyCam, 800, 3, 8);
+  PlaySound(-1, "Zoom_In", "MUGSHOT_CHARACTER_CREATION_SOUNDS", false, 0, true);
+  SetCamActiveWithInterp(faceCam, bodyCam, 400, 3, 8);
   const anim = `mp_character_creation@customise@${isMale ? "" : "fe"}male_a`;
   TaskPlayAnim(ped, anim, "face", 1, -1, -1, 513, 1, false, false, false);
 }

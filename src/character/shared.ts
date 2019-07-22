@@ -1,6 +1,8 @@
 import { mums, dads } from "../constants/parents";
+import HeadOverlays from "../constants/headOverlays";
 
 export function updateHeritage(
+  isMale: boolean,
   ped: number,
   mum: number,
   dad: number,
@@ -15,7 +17,7 @@ export function updateHeritage(
     mums[mum].id,
     dads[dad].id,
     0,
-    shapeMix,
+    isMale ? shapeMix * 0.95 + 0.025 : shapeMix * 0.95 - 0.025,
     skinMix,
     0,
     false
@@ -24,8 +26,19 @@ export function updateHeritage(
 
 export function setToDefault(ped: number) {
   SetPedDefaultComponentVariation(ped);
-  SetPedComponentVariation(ped, 2, 4, 3, 0);
+  SetPedComponentVariation(ped, 2, 1, 0, 0);
   SetPedComponentVariation(ped, 6, 1, 1, 0);
+}
+
+export function updateFeatures(ped: number) {
+  setEyeBrows(ped, 0, 1);
+  SetPedHeadOverlayColor(ped, HeadOverlays.Eyebrows, 1, 1, 1);
+
+  SetPedEyeColor(ped, Math.round(Math.random() * 8));
+}
+
+export function setEyeBrows(ped: number, id: number, opacity: number) {
+  SetPedHeadOverlay(ped, HeadOverlays.Eyebrows, id, opacity);
 }
 
 export function func_1636(

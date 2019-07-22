@@ -16,3 +16,10 @@ export function noop() {}
 export function delay(ms: number | undefined) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+const cache = {};
+
+export function getLabel(arg: string) {
+  if (cache[arg] === undefined) cache[arg] = GetLabelText(arg);
+  return cache[arg];
+}

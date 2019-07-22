@@ -1,7 +1,13 @@
-import { waitFor, delay } from "../util";
+import { waitFor, delay, getLabel } from "../util";
 import { addTick } from "../addTick";
 import MainMenuScene from "./MainMenuScene";
-import { setToDefault, updateHeritage, func_1636 } from "./shared";
+import {
+  setToDefault,
+  updateHeritage,
+  func_1636,
+  updateFeatures
+} from "./shared";
+import HeadOverlays from "../constants/headOverlays";
 
 export default async function(
   isMale: boolean,
@@ -33,6 +39,9 @@ export default async function(
   let anim = `mp_character_creation@customise@${isMale ? "" : "fe"}male_a`;
   RequestAnimDict(anim);
 
+  RequestScriptAudioBank("DLC_GTAO/MUGSHOT_ROOM", false);
+  RequestScriptAudioBank("Mugshot_Character_Creator", false);
+
   await waitFor(
     () =>
       !!HasScaleformMovieLoaded(boardScaleform) &&
@@ -61,7 +70,8 @@ export default async function(
   FreezeEntityPosition(ped, false);
 
   setToDefault(ped);
-  updateHeritage(ped, mum, dad, shapeMix, skinMix);
+  updateHeritage(isMale, ped, mum, dad, shapeMix, skinMix);
+  updateFeatures(ped);
 
   const boardModel = GetHashKey("prop_police_id_board");
   const overlayModel = GetHashKey("prop_police_id_text");
@@ -140,7 +150,7 @@ export default async function(
         "Your Name",
         "TRANSFERRED",
         "0000532131",
-        "LOS SANTOS POLICE DEPT",
+        getLabel("FACE_B_POL"),
         1
       )
   );
@@ -174,7 +184,7 @@ export default async function(
   await delay(fastMode ? 50 : 250);
 
   const [camFrom, camTo] = makeCameras();
-  SetCamActiveWithInterp(camTo, camFrom, fastMode ? 100 : 4400, 8, 8);
+  SetCamActiveWithInterp(camTo, camFrom, fastMode ? 100 : 6000, 8, 8);
 
   while (GetSequenceProgress(ped) !== 1) {
     await delay(250);

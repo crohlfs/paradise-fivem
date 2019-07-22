@@ -8,14 +8,16 @@ import {
   optionItem,
   menuItem,
   disabledItem,
-  standardSpacer
+  standardSpacer,
+  helpNotice
 } from "../ui";
 import { addTick, clearTick } from "../addTick";
-import Controls from "../constants/controls";
-import { waitFor, delay } from "../util";
+import { waitFor, delay, getLabel } from "../util";
 import { setToDefault, updateHeritage } from "./shared";
+import Controls from "../constants/controls";
 import HeritageScene from "./HeritageScene";
 import FeaturesScene from "./FeaturesScene";
+import AppearanceScene from "./AppearanceScene";
 
 const baseWidth = 1920;
 const baseHeight = 1080;
@@ -23,26 +25,9 @@ const baseHeight = 1080;
 const w = 432 / baseWidth;
 const itemHeight = 38 / baseHeight;
 
-function getLabel(
-  selectedIndex: number,
-  text: string,
-  itemIndex: number,
-  disabled = false,
-  withArrows = false
-) {
-  return disabled
-    ? "~HUD_COLOUR_GREYDARK~" + text
-    : itemIndex === selectedIndex
-    ? withArrows
-      ? `~s~~HUD_COLOUR_BLACK~← ${text} ~s~~HUD_COLOUR_BLACK~→`
-      : "~HUD_COLOUR_BLACK~" + text
-    : text;
-}
-
 type Vec4 = [number, number, number, number];
-const white: Vec4 = [240, 240, 240, 255];
-const fadedBlack: Vec4 = [0, 0, 0, 180];
 const fadedBlue: Vec4 = [0, 20, 35, 180];
+const selectedBlue: Vec4 = [45, 110, 185, 255];
 
 export default async function(
   bodyCam: number,
@@ -63,6 +48,10 @@ export default async function(
       } else if (i === 2) {
         clearTick(handle);
         FeaturesScene(isMale, bodyCam, mum, dad, shapeMix, skinMix, board);
+        return;
+      } else if (i === 3) {
+        clearTick(handle);
+        AppearanceScene(isMale, bodyCam, mum, dad, shapeMix, skinMix, board);
         return;
       }
     } else if (IsControlJustPressed(0, Controls.FrontendUp)) {
@@ -139,38 +128,39 @@ export default async function(
         );
 
         setToDefault(ped);
-        updateHeritage(ped, mum, dad, shapeMix, skinMix);
+        updateHeritage(isMale, ped, mum, dad, shapeMix, skinMix);
         SetModelAsNoLongerNeeded(model);
       })();
     }
 
     const helpTexts = [
-      "Select the gender of your Character.",
-      "Select to choose your parents.",
-      "Select to alter your facial Features.",
-      "Select to change your Appearance.",
-      "Select to change your Apparel.",
-      "Ready to start playing GTA Online?"
-    ];
+      "FACE_MM_H2",
+      "FACE_MM_H3",
+      "FACE_MM_H4",
+      "FACE_MM_H6",
+      "FACE_MM_H7",
+      "FACE_MM_H8"
+    ].map(getLabel);
 
     drawItems(
-      header(w, "Character Creator"),
-      subtitle(w, "NEW CHARACTER"),
-      optionItem(w, "Sex", isMale ? "Male" : "Female", i === 0),
-      menuItem(w, "Heritage", i === 1),
-      menuItem(w, "Features", i === 2),
-      disabledItem(w, "Appearance", i === 3),
-      disabledItem(w, "Apparel", i === 4),
+      header(w, getLabel("FACE_TITLE")),
+      subtitle(w, getLabel("FACE_MMT")),
+      optionItem(
+        w,
+        getLabel("FACE_SEX"),
+        isMale ? getLabel("FACE_MALE") : getLabel("FACE_FEMALE"),
+        i === 0
+      ),
+      menuItem(w, getLabel("FACE_HERI"), i === 1),
+      menuItem(w, getLabel("FACE_FEAT"), i === 2),
+      menuItem(w, getLabel("FACE_APP"), i === 3),
+      disabledItem(w, getLabel("FACE_APPA"), i === 4),
       batch(
-        rect(w, itemHeight, ...(i === 5 ? white : fadedBlue)),
-        text(w, itemHeight, getLabel(i, "Save & Continue", 5, true), 0, 0.325)
+        rect(w, itemHeight, ...(i === 5 ? selectedBlue : fadedBlue)),
+        text(w, itemHeight, getLabel("FACE_SAVE"), 0, 0.325)
       ),
       standardSpacer,
-      rect(w, 3 / baseHeight, 0, 0, 0, 255),
-      batch(
-        rect(w, itemHeight, ...fadedBlack),
-        text(w, itemHeight, helpTexts[i], 0, 0.325)
-      )
+      ...helpNotice(w, helpTexts[i])
     )(246 / baseWidth, 46 / baseHeight);
   });
 }

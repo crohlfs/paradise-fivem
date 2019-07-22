@@ -8,12 +8,13 @@ import {
   batch,
   rect,
   text,
-  Align,
   optionItem,
   subtitle,
-  standardSpacer
+  standardSpacer,
+  separator
 } from "../ui";
 import { fadedBlack } from "../colors";
+import { getLabel } from "../util";
 
 const baseWidth = 1920;
 const baseHeight = 1080;
@@ -48,44 +49,48 @@ export default async function(
   let sliceStart = 0;
   let sliceEnd = 8;
 
+  const custom = getLabel("FACE_F_P_CUST");
   const handle = addTick(() => {
     const items = [
-      optionItem(w, "Brow", "Custom", i === 0),
-      optionItem(w, "Eyes", "Custom", i === 1),
-      optionItem(w, "Nose", "Custom", i === 2),
-      optionItem(w, "Nose Profile", "Custom", i === 3),
-      optionItem(w, "Nose Tip", "Custom", i === 4),
-      optionItem(w, "Cheekbones", "Custom", i === 5),
-      optionItem(w, "Cheeks", "Custom", i === 6),
-      optionItem(w, "Lips", "Custom", i === 7),
-      optionItem(w, "Jaw", "Custom", i === 8),
-      optionItem(w, "Chin Profile", "Custom", i === 9),
-      optionItem(w, "Chin Shape", "Custom", i === 10)
+      optionItem(w, getLabel("FACE_F_BROW"), custom, i === 0),
+      optionItem(w, getLabel("FACE_F_EYES"), custom, i === 1),
+      optionItem(w, getLabel("FACE_F_NOSE"), custom, i === 2),
+      optionItem(w, getLabel("FACE_F_NOSEP"), custom, i === 3),
+      optionItem(w, getLabel("FACE_F_NOSET"), custom, i === 4),
+      optionItem(w, getLabel("FACE_F_CHEEK"), custom, i === 5),
+      optionItem(w, getLabel("FACE_F_CHEEKS"), custom, i === 6),
+      optionItem(w, getLabel("FACE_F_LIPS"), custom, i === 7),
+      optionItem(w, getLabel("FACE_F_JAW"), custom, i === 8),
+      optionItem(w, getLabel("FACE_F_CHIN"), custom, i === 9),
+      optionItem(w, getLabel("FACE_F_CHINS"), custom, i === 10)
     ].slice(sliceStart, sliceEnd);
 
     drawItems(
-      header(w, "Character Creator"),
-      subtitle(w, "FEATURES", `${i + 1}/11`),
+      header(w, getLabel("FACE_TITLE")),
+      subtitle(w, getLabel("FACE_FEATT"), `${i + 1}/11`),
       ...items,
       standardSpacer,
-      batch(
-        rect(w, ih, ...fadedBlack),
-        (x, y) => text(w, ih, "↑", 0, 0.325, Align.Center)(x, y - 0.0035),
-        (x, y) =>
-          text(w, ih, "↓", 0, 0.325, Align.Center)(x, y + 0.0035) - 0.0035
-      ),
+      separator(w),
       standardSpacer,
       rect(w, 3 / baseHeight, 0, 0, 0, 255),
       batch(
         rect(w, ih, ...fadedBlack),
-        text(w, ih, "Make changes to your physical Features.", 0, 0.325)
+        text(w, ih, getLabel("FACE_FEAT_H"), 0, 0.325)
       )
     )(246 / 1920, 46 / 1080);
 
     if (IsControlJustPressed(0, Controls.FrontendCancel)) {
       clearTick(handle);
       MainMenuScene(bodyCam, isMale, mum, dad, shapeMix, skinMix, board, 2);
-      SetCamActiveWithInterp(bodyCam, faceCam, 800, 3, 8);
+      PlaySound(
+        -1,
+        "Zoom_Out",
+        "MUGSHOT_CHARACTER_CREATION_SOUNDS",
+        false,
+        0,
+        true
+      );
+      SetCamActiveWithInterp(bodyCam, faceCam, 400, 3, 8);
       TaskPlayAnim(ped, anim, "loop", 1, -1, -1, 513, 1, false, false, false);
     } else if (IsControlJustPressed(0, Controls.FrontendUp)) {
       i--;
@@ -115,6 +120,7 @@ export default async function(
   func_1636(faceCam, 1.5, 3.5, 0.5, 1);
   ShakeCam(faceCam, "HAND_SHAKE", 0.1);
 
-  SetCamActiveWithInterp(faceCam, bodyCam, 800, 3, 8);
+  PlaySound(-1, "Zoom_In", "MUGSHOT_CHARACTER_CREATION_SOUNDS", false, 0, true);
+  SetCamActiveWithInterp(faceCam, bodyCam, 400, 3, 8);
   TaskPlayAnim(ped, anim, "face", 1, -1, -1, 513, 1, false, false, false);
 }

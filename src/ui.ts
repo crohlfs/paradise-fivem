@@ -69,6 +69,8 @@ export function spacer(h: number) {
   return drawFunc;
 }
 
+export const blank = spacer(0);
+
 export const standardSpacer = spacer(2 / baseHeight);
 
 export enum Align {
@@ -86,7 +88,13 @@ export function text(
   alignment: Align = Align.Left
 ) {
   function drawFunc(x: number, y: number): number {
-    BeginTextCommandDisplayText("STRING");
+    if (str.startsWith("$")) {
+      BeginTextCommandDisplayText(str.slice(1));
+    } else {
+      BeginTextCommandDisplayText("STRING");
+      AddTextComponentSubstringPlayerName(str);
+    }
+
     SetTextFont(font);
     SetTextColour(255, 255, 255, 255);
     SetTextScale(size, size);
@@ -94,9 +102,9 @@ export function text(
     if (alignment === Align.Right) {
       SetTextWrap(0, w * 1.03);
       SetTextJustification(2);
+    } else if (alignment === Align.Center) {
+      SetTextJustification(0);
     }
-
-    AddTextComponentSubstringPlayerName(str);
 
     const oy = GetTextScaleHeight(size, font) / 4;
     EndTextCommandDisplayText(
@@ -168,4 +176,24 @@ export function subtitle(w: number, left: string, right?: string) {
         rect(w, ih, 0, 0, 0, 255),
         text(w, ih, "~HUD_COLOUR_HB_BLUE~" + left, 0, 0.325)
       );
+}
+
+//TODO: Make word wrapping automatic, instead of requiring lines to be passed in
+export function helpNotice(w: number, notice: string | string[]) {
+  return [
+    rect(w, 3 / baseHeight, 0, 0, 0, 255),
+    ...(notice instanceof Array
+      ? notice.map((n, i) =>
+          batch(rect(w, ih, ...fadedBlack), text(w, ih, n, 0, 0.325))
+        )
+      : [batch(rect(w, ih, ...fadedBlack), text(w, ih, notice, 0, 0.325))])
+  ];
+}
+
+export function separator(w: number) {
+  return batch(
+    rect(w, ih, ...fadedBlack),
+    (x, y) => text(w, ih, "↑", 0, 0.43, Align.Center)(x, y - 0.008),
+    (x, y) => text(w, ih, "↓", 0, 0.43, Align.Center)(x, y - 0.001)
+  );
 }
