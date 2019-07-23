@@ -3,16 +3,8 @@
   "version": "1.0.0",
   "main": "",
   "license": "MIT",
-  "scripts": {
-    "start": "node watch.js"
-  },
   "dependencies": {
-    "@thelarinel/rcon": "^1.0.4",
-    "chokidar": "^3.0.2",
-    "lodash": "^4.17.14",
-    "memoize-one": "^5.0.5",
-    "quake3-rcon": "^0.2.1",
-    "rcon-ts": "^1.2.3"
+    "memoize-one": "^5.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
@@ -20,7 +12,6 @@
     "@babel/preset-typescript": "^7.3.3",
     "@citizenfx/client": "^1.0.1399-1",
     "@citizenfx/server": "^1.0.1399-1",
-    "@types/lodash": "^4.14.136",
     "@types/memoize-one": "^4.1.1",
     "@types/node": "^12.6.3",
     "babel-loader": "^8.0.6",
